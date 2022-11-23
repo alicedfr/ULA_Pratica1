@@ -1,0 +1,19 @@
+-- compara dois bits de operandos diferentes
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity FC is
+	Port ( x : in STD_LOGIC;
+	       y : in STD_LOGIC;
+	       g : out STD_LOGIC;
+	       e : out STD_LOGIC;
+	       s : out STD_LOGIC);
+end FC;
+
+architecture Behavioral of FC is
+
+begin
+	g <= x and (not(y)); -- verifica se o bit do primeiro operando é maior do que o do segundo
+	e <= x xor y; -- verifica se o bit do primeiro operando é igual ao do segundo
+	s <= (not(x) and y); -- verifica se o bit do primeiro operando é menor do que o do segundo
+end Behavioral;
