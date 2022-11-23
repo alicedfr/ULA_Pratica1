@@ -1,0 +1,27 @@
+-- subtração de 4 bits no modelo complemento de 2
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity subtrator is
+	Port ( x : in STD_LOGIC_VECTOR (3 downto 0);
+		     y : in STD_LOGIC_VECTOR (3 downto 0);
+		     ci: in STD_LOGIC;
+		     z : out STD_LOGIC_VECTOR (3 downto 0);
+		     co: out STD_LOGIC);
+end subtrator;
+
+architecture Behavioral of subtrator is
+
+component FA is 
+Port ( x, y, ci: in STD_LOGIC;
+       z, co: out STD_LOGIC);
+end component;
+
+signal c: std_logic_vector (3 downto 1);
+
+begin
+    sub0: FA (x(0), not(y(0)), '1', z(0), c(1)); -- soma o primeiro bit do primeiro operando com o inverso do primeiro bit do segundo operando
+    sub1: FA (x(1), not(y(1)), c(1), z(1), c(2)); -- soma o segundo bit do primeiro operando com o inverso do segundo bit do segundo operando
+    sub2: FA (x(2), not(y(2)), c(2), z(2), c(3)); -- soma o terceiro bit do primeiro operando com o inverso do terceiro bit do segundo operando
+    sub3: FA (x(3), not(y(3)), c(3), z(3), co); -- soma o último bit do primeiro operando com o inverso do último bit do segundo operando
+end Behavioral; 
