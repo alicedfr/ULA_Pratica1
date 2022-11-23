@@ -1,0 +1,27 @@
+-- realiza a soma do primeiro operando com 1
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity incremento1 is
+	Port ( x : in STD_LOGIC_VECTOR (3 downto 0);
+		     ci: in STD_LOGIC;
+		     z : out STD_LOGIC_VECTOR (3 downto 0);
+		     co: out STD_LOGIC);
+end incremento1;
+
+architecture Behavioral of incremento1 is
+
+component FA is 
+  Port ( x, y, ci: in STD_LOGIC;
+         z, co: out STD_LOGIC);
+end component;
+
+
+signal c: std_logic_vector(3 downto 1);
+
+begin
+    inc0: FA port map(x(0), '0', '1', z(0), c(1)); -- realiza a soma de 1 bit do primeiro bit de x com '0' e possui carry in = '1'
+    inc1: FA port map(x(1), '0', c(1), z(1), c(2)); -- realiza a soma de 1 bit do segundo bit de x com '0'
+    inc2: FA port map(x(2), '0', c(2), z(2), c(3)); -- realiza a soma de 1 bit do terceiro bit de x com '0'
+    inc3: FA port map(x(3), '0', c(3), z(3), co); -- realiza a soma de 1 bit do último bit de x com '0'
+end Behavioral;
