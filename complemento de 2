@@ -1,0 +1,26 @@
+-- operação para trocar o sinal de um operando a partir do método de complemento de 2(inverter todos os bits e somar 1 ao bit menos significativo)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity complemento2 is
+Port ( x : in STD_LOGIC_VECTOR (3 downto 0);
+	     ci: in STD_LOGIC;
+       z : out STD_LOGIC_VECTOR (3 downto 0);
+       co : out STD_LOGIC);
+end complemento2;
+
+architecture Behavioral of complemento2 is
+
+component FA is 
+    Port ( x, y, ci: in STD_LOGIC;
+           z, co: out STD_LOGIC);
+end component;
+	
+signal c: std_logic_vector (3 downto 1);
+
+begin
+	c20: FA port map(not(x(0)), '0', '1', z(0), c(1)); -- inverte o primeiro bit de x e adiciona 1 com o carry
+	c21: FA port map(not(x(1)), '0', c(1), z(1), c(2)); -- inverte o segundo bit de x e adiciona ao carry
+	c22: FA port map(not(x(2)), '0', c(2), z(2), c(3)); -- inverte o terceiro bit de x e adiciona ao carry
+	c23: FA port map(not(x(3)), '0', c(3), z(3), co);  -- inverte o último bit de x e adiciona ao carry
+end Behavioral;
