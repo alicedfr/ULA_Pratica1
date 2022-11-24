@@ -1,0 +1,47 @@
+-- comparador de 4 bits(que utiliza o módulo do comparador de 1 bit)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity comparador is
+Port ( x : in STD_LOGIC_VECTOR (3 downto 0);
+		   y : in STD_LOGIC_VECTOR (3 downto 0);
+		   z : out STD_LOGIC_VECTOR (3 downto 0));
+end comparador;
+
+architecture Behavioral of comparador is
+
+component FC is
+	Port (x, y : in STD_LOGIC;
+		    g, e, s : out STD_LOGIC);
+end component;
+
+signal g0: std_logic;
+signal g1: std_logic;
+signal g2: std_logic;
+signal g3: std_logic;
+signal e0: std_logic;
+signal e1: std_logic;
+signal e2: std_logic;
+signal e3: std_logic;
+signal s0: std_logic;
+signal s1: std_logic;
+signal s2: std_logic;
+signal s3: std_logic;
+
+begin
+	FCO: FC port map(x(0), y(0), g0, e0, s0); -- compara os primeiros bits de cada operandO
+	FC1: FC port map(x(1), y(1), g1, e1, s1); -- compara os segundos bits de cada operando
+	FC2: FC port map(x(2), y(2), g2, e2, s2); -- compara os terceiros bits de cada operando
+	FC3: FC port map(x(3), y(3), g3, e3, s3); -- compara os últimos bits de cada operando
+
+	z(0) <= '0';
+	z(1) <= g3 or (e3 and g2) or (e3 and e2 and g1) or (e3 and e2 and e1 and g0);
+	z(2) <= e3 and e2 and e1 and e0;
+	z(3) <= s3 or (e3 and s2) or (e3 and e2 and s1) or (e3 and e2 and e1 and s0); 
+  
+  -- possíveis resultados:
+  -- z = "0001" indica que x é menor que y
+  -- z = "0010" indica que x é igual a y
+  -- z = "0100" indica que x é maior que y
+  
+end Behavioral;
