@@ -1,0 +1,18 @@
+-- faz a comparação and entre dois operandos
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity andbit is
+	Port ( x : in STD_LOGIC_VECTOR (3 downto 0);
+         y : in STD_LOGIC_VECTOR (3 downto 0);
+         z : out STD_LOGIC_VECTOR (3 downto 0));
+end andbit;
+
+architecture Behavioral of andbit is
+begin
+	z(3) <= x(3) and y(3); -- and com os bits mais sigificativos
+	z(2) <= x(2) and y(2); -- and com os segundos bits mais significativos
+	z(1) <= x(1) and y(1); -- and com os segundos bits menos significativos
+	z(0) <= x(0) and y(0); -- and com os bit menos significativos
+
+end Behavioral;
