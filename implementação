@@ -1,0 +1,132 @@
+-- implementação da ula
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+
+
+entity MUX is
+   Port (clk: in STD_LOGIC; -- sinal de clock 
+	       key: in STD_LOGIC; -- permite a passagem ou não do valor de x
+         f : in STD_LOGIC_VECTOR (2 downto 0); -- indicam qual operação a ula deve realizar
+         z : out  STD_LOGIC_VECTOR (3 downto 0); -- saída
+         co : out  STD_LOGIC; -- flag de carry out
+         ovf : out  STD_LOGIC; -- flag de overflow
+         sgn : out  STD_LOGIC; -- flag de sinal(indica se o número é negativo ou não)
+         zero : out  STD_LOGIC); -- flag de zero
+end MUX;
+
+architecture Behavioral of MUX is
+
+-- declaração de todos os componentes da ula(todas as operações utilizadas):
+component Somador is
+Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           ci : in  STD_LOGIC;
+           z : out  STD_LOGIC_VECTOR (3 downto 0);
+           co : out  STD_LOGIC);
+end component;
+
+component Complemento2 is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+				y: in STD_LOGIC_VECTOR(3 downto 0);
+				ci: in STD_LOGIC;
+           z : out  STD_LOGIC_VECTOR (3 downto 0);
+co: out STD_LOGIC);
+end component;
+
+component Subtrator is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           ci : in  STD_LOGIC;
+           z : out  STD_LOGIC_VECTOR (3 downto 0);
+           co : out  STD_LOGIC);
+end component;
+
+component Inc1 is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           ci : in  STD_LOGIC;
+           z : in  STD_LOGIC_VECTOR (3 downto 0);
+           co : in  STD_LOGIC);
+end component;
+
+component Paridade is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           z : out  STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
+component Comparador is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+		z : out STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
+component Andbit is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           z : out  STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
+component Orbit is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           z : out  STD_LOGIC_VECTOR (3 downto 0));
+end component;
+
+component Contador is
+    generic(t_max : integer := 100000000); 
+    port(CLOCK_50: in std_logic;
+    counter_out: out unsigned(3 downto 0) := "0000");
+end component;
+
+
+signal x: std_logic_vector (3 downto 0);
+signal y: std_logic_vector := "0001";
+signal z1, z2, z3, z4, z5, z6, z7, z8: std_logic_vector (3 downto 0);
+signal co1, co2, co3, co4: std_logic;
+signal s: std_logic_vector (3 downto 0);
+signal cont: unsigned (3 downto 0);
+signal clock: std_logic;
+
+
+begin
+  cont1 : contador port map(clock, cont);
+  x <= cont and clock; -- x recebe o contador e permite passagem quando o clock é igual a 1
+
+	add: Somador port map(x, y, ci, z1, co1);
+	comp2: complemento2 port map(x, y, ci, z2, co2);
+	sub: subtrator port map(x, y, ci, z3, co3);
+	inc: inc1 port map(x, y, ci, z4, co4);
+	par: paridade port map(x, z5);
+	comp: comparador port map(x, y, z6);
+	orb: orbit port map(x, y, z7);
+	andb: andbit port map(x, y, z8);
+	
+  -- define qual será a saída para a operação escolhida
+	s <= z1 when (f = "000") else -- add 
+			z2 when (f = "001") else -- comp2
+			z3 when (f = "010") else -- sub
+			z4 when (f = "011") else -- inc1
+			z5 when (f = "100") else -- paridade
+			z6 when (f = "101") else -- comp
+			z7 when (f = "110") else -- or bit a bit
+			z8; -- and bit a bit
+			
+	co <= c1 when (f = "000") else
+			c2 when (f = "001") else
+			c3 when (f = "010") else
+			c4 when (f = "011") else
+			'0';
+
+	ovf <= (s(3) and (not y(3)) and (not x(3))) or 	((not s(3)) and (y(3) and x(3))) when (f = "000" or f = "011") else -- checa se os operandos são do mesmo sinal e o resultado de sinal diferente, cenário que indica overflow 
+			((s(3) and y(3)) and not(x(3))) or ((not(s(3)) and not(y(3))) and x(3)) when (f = "001" or f = "010") else -- mesma lógica da anterior, porém considerando que o y tem o sinal invertido
+				'0';
+
+  zero <= '1' when (s = "0000") else -- compara o resultado da operação com "0000", dando 1 caso a compração seja verdadeira
+  '0';
+
+  sgn <= s(3); -- no sistema de complemento a 2, o bit mais significativo determina se o número é negativo ou não
+
+			
+end Behavioral;
+
